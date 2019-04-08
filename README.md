@@ -11,6 +11,7 @@ Requirements
 Compiling
 ---------
 
+    cd package_bgs/LBSP
     mkdir build
     cd build
     cmake -DCMAKE_BUILD_TYPE=Release ..
