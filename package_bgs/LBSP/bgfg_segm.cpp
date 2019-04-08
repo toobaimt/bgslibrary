@@ -102,12 +102,12 @@ int main(int argc, const char** argv) {
         //Common
         if(oCurrInputFrame.empty())
             break;
-        oBGSAlg.apply(oCurrInputFrame, oCurrSegmMask,double(k<=100)); // lower rate in the early frames helps bootstrap the model when foreground is present
+        oBGSAlg.apply(oCurrInputFrame, oCurrSegmMask, double(k<=100)); // lower rate in the early frames helps bootstrap the model when foreground is present
         oBGSAlg.getBackgroundImage(oCurrReconstrBGImg);
         auto t2 = Clock::now();
-        imwrite("ip/ip-"+oss.str()+".jpg",oCurrInputFrame);
-        imwrite("segm/mask-"+oss.str()+".jpg",oCurrSegmMask);
-        imwrite("bg/bg-"+oss.str()+".jpg",oCurrReconstrBGImg);
+//        imwrite("ip/ip-"+oss.str()+".jpg",oCurrInputFrame);
+        imwrite("../segm/mask-"+oss.str()+".jpg",oCurrSegmMask);
+        imwrite("../bg/bg-"+oss.str()+".jpg",oCurrReconstrBGImg);
         printf("\nFrame %6d processed in %ld ms", k, std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count() );
         if(cv::waitKey(1)==27)
             break;
