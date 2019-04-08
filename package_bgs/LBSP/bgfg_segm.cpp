@@ -14,6 +14,7 @@
 #include <iomanip>
 #include <vector>
 #include <dirent.h>
+#include <sys/stat.h>
 
 typedef std::chrono::high_resolution_clock Clock;
 
@@ -68,7 +69,6 @@ int main(int argc, const char** argv) {
             printf("Could not open video file at '%s'.\n",sVideoFilePath.c_str());
         return -1;
     }*/
-
 ////    For Images
     const std::string sFilePath = "/home/tooba/Downloads/pawcs/Surv_Cam_Cmpr_5pm_W8";
     std::vector<std::string> f;
@@ -88,6 +88,9 @@ int main(int argc, const char** argv) {
     cv::Mat oSequenceROI(oCurrInputFrame.size(),CV_8UC1,cv::Scalar_<uchar>(255));
     BackgroundSubtractorPAWCS oBGSAlg;
     oBGSAlg.initialize(oCurrInputFrame,oSequenceROI);
+
+    mkdir("../bg", ACCESSPERMS);
+    mkdir("../segm", ACCESSPERMS);
 
     for(int k=2; k<f.size(); k++) {
 ////    For video
