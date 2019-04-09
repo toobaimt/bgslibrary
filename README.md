@@ -19,3 +19,7 @@ Compiling
     ./bgfg_segm
 
 
+Usage
+---------
+
+    ./bgfg_segm [--v]=<process video, true/false>, [--im]=<process images, true/false>, [--file]=<path to folder/video>, [--ROI]=<use ROI, true/false>, [--pR]=<path to ROI bmp file>
