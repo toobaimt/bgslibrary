@@ -27,9 +27,9 @@ static void help() {
 }
 
 const char* keys = {
-    "{v     |false    | process video}"
-    "{im    |true     | process images}"
-    "{file  |/home/tooba/Downloads/bgslibrary/package_bgs/LBSP/Surv_Cam_Sample | movie file path  }"
+    "{v     |false     | process video}"
+    "{im    |true    | process images}"
+    "{file  |/home/tooba/Downloads/bgslibrary/package_bgs/LBSP/MVI_0797/ip | movie file path  }"
     "{ROI   |false    | use ROI}"
     "{pR    |ROI.bmp  | path to ROI}"
 };
@@ -52,7 +52,7 @@ int main(int argc, const char** argv) {
     const bool readImages = parser.get<bool>("im");
     const bool readVideo = parser.get<bool>("v");
     const bool ROI = parser.get<bool>("ROI");
-    const std::string sVideoFilePath = parser.get<std::string>("file");
+    std::string sVideoFilePath = parser.get<std::string>("file");
 
     cv::Mat oCurrInputFrame, oCurrSegmMask, oCurrReconstrBGImg;
     std::vector<std::string> f;
@@ -67,8 +67,13 @@ int main(int argc, const char** argv) {
     else if(readVideo){
         ////    For Video
         oVideoInput.open(sVideoFilePath);
+        sVideoFilePath = sVideoFilePath.substr(0,sVideoFilePath.length()-4);
         oVideoInput >> oCurrInputFrame;
         oVideoInput.set(cv::CAP_PROP_POS_FRAMES,0);
+        std::string vidPath = sVideoFilePath;
+        mkdir(vidPath.c_str(), ACCESSPERMS);
+        std::string ipPath = sVideoFilePath+"/ip";
+        mkdir(ipPath.c_str(), ACCESSPERMS);
     }
 
     if(oCurrInputFrame.empty()) {
@@ -89,9 +94,10 @@ int main(int argc, const char** argv) {
     BackgroundSubtractorPAWCS oBGSAlg;
     oBGSAlg.initialize(oCurrInputFrame,oSequenceROI);
 
-//    mkdir("../ip", ACCESSPERMS);
-    mkdir("../bg", ACCESSPERMS);
-    mkdir("../segm", ACCESSPERMS);
+    std::string bgPath = sVideoFilePath+"/bg";
+    std::string segPath = sVideoFilePath+"/segm";
+    mkdir(bgPath.c_str(), ACCESSPERMS);
+    mkdir(segPath.c_str(), ACCESSPERMS);
 
     if(readImages){
         for(int k=2; k<f.size(); k++) {
@@ -120,7 +126,7 @@ int main(int argc, const char** argv) {
             ////    For video
             oVideoInput >> oCurrInputFrame;
             std::ostringstream oss;
-            oss << std::setfill('0') << std::setw(6) << k-2;
+            oss << std::setfill('0') << std::setw(6) << k;
             auto t1 = Clock::now();
 
             //Common
@@ -130,10 +136,10 @@ int main(int argc, const char** argv) {
                                                                  100)); // lower rate in the early frames helps bootstrap the model when foreground is present
             oBGSAlg.getBackgroundImage(oCurrReconstrBGImg);
             auto t2 = Clock::now();
-            //imwrite("..ip/ip-"+oss.str()+".jpg",oCurrInputFrame);
+            imwrite(sVideoFilePath+"/ip/ip-"+oss.str()+".jpg",oCurrInputFrame);
             imwrite(sVideoFilePath+"/segm/mask-" + oss.str() + ".jpg", oCurrSegmMask);
             imwrite(sVideoFilePath+"/bg/bg-" + oss.str() + ".jpg", oCurrReconstrBGImg);
-            printf("\nFrame %6d processed in %ld ms", k-2,
+            printf("\nFrame %6d processed in %ld ms", k,
                    std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count());
             if (cv::waitKey(1) == 27)
                 break;
